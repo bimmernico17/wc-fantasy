@@ -1,0 +1,675 @@
+<div id="app-root"></div>
+<style>
+:root{
+  --turf-dark:#050a14;
+  --turf:#11264a;
+  --turf-light:#2f6fd6;
+  --chalk:#f4f6fa;
+  --amber:#5b9dff;
+  --navy:#070d18;
+  --crowd:#7d8aa3;
+  --danger:#d65c4f;
+  --font-display:'Oswald', 'Arial Narrow', sans-serif;
+  --font-mono:'Share Tech Mono', 'Courier New', monospace;
+  --font-body:'Inter', system-ui, sans-serif;
+}
+@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Share+Tech+Mono&family=Inter:wght@400;500;600;700&display=swap');
+
+*{box-sizing:border-box;}
+#app-root{
+  font-family:var(--font-body);
+  background:var(--navy);
+  color:var(--chalk);
+  min-height:100vh;
+  padding:0;
+  background-image:
+    radial-gradient(circle at 10% 0%, rgba(47,111,214,0.28), transparent 40%),
+    radial-gradient(circle at 90% 100%, rgba(244,246,250,0.06), transparent 45%);
+}
+.wrap{max-width:980px;margin:0 auto;padding:20px 16px 60px;}
+
+/* Header / ticker */
+.header{
+  display:flex;flex-direction:column;gap:4px;
+  padding:18px 0 14px;border-bottom:2px solid var(--turf-light);
+  margin-bottom:6px;
+}
+.header h1{
+  font-family:var(--font-display);
+  font-size:clamp(28px,5vw,42px);
+  letter-spacing:0.5px;
+  margin:0;
+  text-transform:uppercase;
+  color:var(--chalk);
+}
+.header h1 span{color:var(--amber);}
+.header .sub{color:var(--crowd);font-size:13px;letter-spacing:1px;text-transform:uppercase;font-family:var(--font-mono);}
+
+.ticker{
+  overflow:hidden;white-space:nowrap;background:var(--turf-dark);
+  border:1px solid var(--turf-light);border-radius:4px;margin:14px 0 20px;
+  padding:8px 0;position:relative;
+}
+.ticker-inner{display:inline-block;animation:scroll-left 28s linear infinite;font-family:var(--font-mono);font-size:13px;}
+.ticker:hover .ticker-inner{animation-play-state:paused;}
+@keyframes scroll-left{0%{transform:translateX(0);}100%{transform:translateX(-50%);}}
+.ticker-item{display:inline-block;padding:0 24px;color:var(--chalk);}
+.ticker-item b{color:var(--amber);}
+
+/* Tabs */
+.tabs{display:flex;gap:6px;margin-bottom:18px;flex-wrap:wrap;}
+.tab-btn{
+  font-family:var(--font-display);text-transform:uppercase;letter-spacing:0.5px;
+  background:transparent;border:1px solid var(--turf-light);color:var(--crowd);
+  padding:9px 16px;border-radius:3px;cursor:pointer;font-size:14px;
+  transition:all .15s ease;
+}
+.tab-btn:hover{border-color:var(--amber);color:var(--chalk);}
+.tab-btn.active{background:var(--turf-light);color:var(--chalk);border-color:var(--turf-light);}
+
+.panel{
+  background:rgba(255,255,255,0.03);
+  border:1px solid rgba(255,255,255,0.08);
+  border-radius:6px;padding:20px;
+}
+.panel h2{
+  font-family:var(--font-display);text-transform:uppercase;font-size:20px;
+  margin:0 0 14px;letter-spacing:0.5px;border-left:4px solid var(--amber);padding-left:10px;
+}
+.panel h3{font-family:var(--font-display);font-size:15px;text-transform:uppercase;color:var(--crowd);margin:18px 0 8px;letter-spacing:0.5px;}
+
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;margin-bottom:10px;}
+.field{display:flex;flex-direction:column;gap:4px;flex:1;min-width:120px;}
+.field label{font-size:11px;text-transform:uppercase;color:var(--crowd);letter-spacing:0.5px;font-family:var(--font-mono);}
+input,select{
+  background:var(--navy);border:1px solid rgba(255,255,255,0.15);color:var(--chalk);
+  padding:9px 10px;border-radius:3px;font-size:14px;font-family:var(--font-body);
+}
+input:focus,select:focus{outline:2px solid var(--amber);border-color:var(--amber);}
+button.btn{
+  font-family:var(--font-display);text-transform:uppercase;letter-spacing:0.5px;
+  background:var(--amber);color:var(--navy);border:none;padding:10px 18px;
+  border-radius:3px;cursor:pointer;font-size:14px;font-weight:600;white-space:nowrap;
+}
+button.btn:hover{background:#ffc657;}
+button.btn.secondary{background:transparent;border:1px solid var(--turf-light);color:var(--chalk);}
+button.btn.secondary:hover{border-color:var(--amber);}
+button.btn.danger{background:var(--danger);color:white;}
+button.btn:disabled{opacity:0.4;cursor:not-allowed;}
+
+table{width:100%;border-collapse:collapse;margin-top:8px;font-size:14px;}
+th{
+  text-align:left;font-family:var(--font-mono);font-size:11px;text-transform:uppercase;
+  color:var(--crowd);padding:8px 8px;border-bottom:1px solid rgba(255,255,255,0.15);letter-spacing:0.5px;
+}
+td{padding:9px 8px;border-bottom:1px solid rgba(255,255,255,0.06);}
+tr:hover td{background:rgba(255,255,255,0.02);}
+.pos-tag{
+  font-family:var(--font-mono);font-size:11px;padding:2px 7px;border-radius:3px;
+  display:inline-block;font-weight:bold;
+}
+.pos-GK{background:#5a6a8a;color:#fff;}
+.pos-DEF{background:#1d3b6e;color:#fff;}
+.pos-MID{background:#2f6fd6;color:#fff;}
+.pos-FWD{background:#d65c4f;color:#fff;}
+
+.empty{
+  text-align:center;padding:40px 20px;color:var(--crowd);font-family:var(--font-mono);font-size:14px;
+}
+.standings-row{display:grid;grid-template-columns:36px 1fr 90px;gap:10px;align-items:center;padding:12px 10px;border-bottom:1px solid rgba(255,255,255,0.06);}
+.standings-row:first-child{border-top:1px solid rgba(255,255,255,0.06);}
+.rank{font-family:var(--font-display);font-size:20px;color:var(--amber);text-align:center;}
+.rank.r1{color:#ffd866;}
+.standings-name{font-weight:600;}
+.standings-pts{font-family:var(--font-mono);font-size:18px;text-align:right;color:var(--chalk);}
+.standings-sub{font-size:11px;color:var(--crowd);font-family:var(--font-mono);}
+
+.squad-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin-top:10px;}
+.squad-card{
+  background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:4px;
+  padding:10px;display:flex;flex-direction:column;gap:4px;position:relative;
+}
+.squad-card .name{font-weight:600;font-size:13px;}
+.squad-card .team{color:var(--crowd);font-size:11px;font-family:var(--font-mono);}
+.squad-card button{
+  position:absolute;top:6px;right:6px;background:transparent;border:none;color:var(--danger);
+  cursor:pointer;font-size:13px;font-weight:bold;
+}
+.count-badge{
+  font-family:var(--font-mono);font-size:13px;color:var(--amber);background:rgba(255,182,39,0.1);
+  padding:4px 10px;border-radius:3px;display:inline-block;
+}
+.loading{text-align:center;padding:60px;color:var(--crowd);font-family:var(--font-mono);}
+.gw-select{margin-bottom:14px;}
+.note{font-size:12px;color:var(--crowd);margin-top:6px;line-height:1.5;}
+.manager-select-bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;}
+.manager-chip{
+  font-family:var(--font-display);text-transform:uppercase;font-size:13px;
+  border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.03);color:var(--chalk);
+  padding:7px 14px;border-radius:20px;cursor:pointer;
+}
+.manager-chip.active{background:var(--turf-light);border-color:var(--turf-light);}
+@media (max-width:600px){
+  .field{min-width:100%;}
+  table{font-size:12px;}
+}
+</style>
+<script>
+(function(){
+  // ====== FIREBASE SETUP — paste your Realtime Database URL here ======
+  // Example: "https://your-project-id-default-rtdb.firebaseio.com"
+  const FIREBASE_DB_URL = "https://wc-fantasy-65f06-default-rtdb.firebaseio.com/";
+  const DATA_PATH = "wc_fantasy_league_v1";
+  // ======================================================================
+  let state = { players: [], managers: [], gameweeks: {} };
+  let loaded = false;
+  let activeTab = "squads";
+  let selectedManagerId = null;
+  let currentGW = 1;
+
+  const SEED_PLAYERS = [
+    // Argentina
+    ["Lionel Messi","Argentina","FWD"],["Julian Alvarez","Argentina","FWD"],["Lautaro Martinez","Argentina","FWD"],
+    ["Rodrigo De Paul","Argentina","MID"],["Enzo Fernandez","Argentina","MID"],["Alexis Mac Allister","Argentina","MID"],
+    ["Cristian Romero","Argentina","DEF"],["Nicolas Otamendi","Argentina","DEF"],["Emiliano Martinez","Argentina","GK"],
+    // France
+    ["Kylian Mbappe","France","FWD"],["Ousmane Dembele","France","FWD"],["Marcus Thuram","France","FWD"],
+    ["Antoine Griezmann","France","MID"],["Aurelien Tchouameni","France","MID"],["Eduardo Camavinga","France","MID"],
+    ["William Saliba","France","DEF"],["Dayot Upamecano","France","DEF"],["Mike Maignan","France","GK"],
+    // Brazil
+    ["Vinicius Junior","Brazil","FWD"],["Rodrygo","Brazil","FWD"],["Endrick","Brazil","FWD"],
+    ["Bruno Guimaraes","Brazil","MID"],["Lucas Paqueta","Brazil","MID"],["Casemiro","Brazil","MID"],
+    ["Marquinhos","Brazil","DEF"],["Eder Militao","Brazil","DEF"],["Alisson","Brazil","GK"],
+    // England
+    ["Harry Kane","England","FWD"],["Phil Foden","England","MID"],["Bukayo Saka","England","FWD"],
+    ["Jude Bellingham","England","MID"],["Declan Rice","England","MID"],["Cole Palmer","England","MID"],
+    ["John Stones","England","DEF"],["Kyle Walker","England","DEF"],["Jordan Pickford","England","GK"],
+    // Spain
+    ["Lamine Yamal","Spain","FWD"],["Nico Williams","Spain","FWD"],["Alvaro Morata","Spain","FWD"],
+    ["Pedri","Spain","MID"],["Rodri","Spain","MID"],["Fabian Ruiz","Spain","MID"],
+    ["Robin Le Normand","Spain","DEF"],["Dani Carvajal","Spain","DEF"],["Unai Simon","Spain","GK"],
+    // Portugal
+    ["Cristiano Ronaldo","Portugal","FWD"],["Joao Felix","Portugal","FWD"],["Goncalo Ramos","Portugal","FWD"],
+    ["Bruno Fernandes","Portugal","MID"],["Bernardo Silva","Portugal","MID"],["Vitinha","Portugal","MID"],
+    ["Ruben Dias","Portugal","DEF"],["Joao Cancelo","Portugal","DEF"],["Diogo Costa","Portugal","GK"],
+    // Germany
+    ["Jamal Musiala","Germany","MID"],["Florian Wirtz","Germany","MID"],["Kai Havertz","Germany","FWD"],
+    ["Joshua Kimmich","Germany","MID"],["Leroy Sane","Germany","FWD"],["Niclas Fullkrug","Germany","FWD"],
+    ["Antonio Rudiger","Germany","DEF"],["Jonathan Tah","Germany","DEF"],["Manuel Neuer","Germany","GK"],
+    // Netherlands
+    ["Cody Gakpo","Netherlands","FWD"],["Memphis Depay","Netherlands","FWD"],["Xavi Simons","Netherlands","MID"],
+    ["Frenkie de Jong","Netherlands","MID"],["Tijjani Reijnders","Netherlands","MID"],
+    ["Virgil van Dijk","Netherlands","DEF"],["Nathan Ake","Netherlands","DEF"],["Bart Verbruggen","Netherlands","GK"],
+    // Belgium
+    ["Kevin De Bruyne","Belgium","MID"],["Romelu Lukaku","Belgium","FWD"],["Jeremy Doku","Belgium","FWD"],
+    ["Youri Tielemans","Belgium","MID"],["Amadou Onana","Belgium","MID"],
+    ["Wout Faes","Belgium","DEF"],["Thomas Meunier","Belgium","DEF"],["Koen Casteels","Belgium","GK"],
+    // Italy
+    ["Federico Chiesa","Italy","FWD"],["Moise Kean","Italy","FWD"],["Nicolo Barella","Italy","MID"],
+    ["Sandro Tonali","Italy","MID"],["Davide Frattesi","Italy","MID"],
+    ["Alessandro Bastoni","Italy","DEF"],["Giovanni Di Lorenzo","Italy","DEF"],["Gianluigi Donnarumma","Italy","GK"],
+    // USA
+    ["Christian Pulisic","USA","MID"],["Folarin Balogun","USA","FWD"],["Weston McKennie","USA","MID"],
+    ["Tyler Adams","USA","MID"],["Gio Reyna","USA","MID"],
+    ["Antonee Robinson","USA","DEF"],["Chris Richards","USA","DEF"],["Matt Turner","USA","GK"],
+    // Mexico
+    ["Santiago Gimenez","Mexico","FWD"],["Hirving Lozano","Mexico","FWD"],["Edson Alvarez","Mexico","MID"],
+    ["Orbelin Pineda","Mexico","MID"],
+    ["Cesar Montes","Mexico","DEF"],["Julian Araujo","Mexico","DEF"],["Guillermo Ochoa","Mexico","GK"],
+    // Croatia
+    ["Luka Modric","Croatia","MID"],["Ivan Perisic","Croatia","FWD"],["Andrej Kramaric","Croatia","FWD"],
+    ["Mateo Kovacic","Croatia","MID"],["Josko Gvardiol","Croatia","DEF"],["Dominik Livakovic","Croatia","GK"],
+    // Morocco
+    ["Achraf Hakimi","Morocco","DEF"],["Hakim Ziyech","Morocco","MID"],["Youssef En-Nesyri","Morocco","FWD"],
+    ["Sofyan Amrabat","Morocco","MID"],["Yassine Bounou","Morocco","GK"],
+    // Japan
+    ["Takefusa Kubo","Japan","FWD"],["Kaoru Mitoma","Japan","FWD"],["Wataru Endo","Japan","MID"],
+    ["Hidemasa Morita","Japan","MID"],["Zion Suzuki","Japan","GK"],
+    // Senegal
+    ["Sadio Mane","Senegal","FWD"],["Nicolas Jackson","Senegal","FWD"],["Idrissa Gueye","Senegal","MID"],
+    ["Kalidou Koulibaly","Senegal","DEF"],["Edouard Mendy","Senegal","GK"]
+  ];
+
+  const root = document.getElementById("app-root");
+  let configError = !FIREBASE_DB_URL || FIREBASE_DB_URL.indexOf("PASTE_YOUR") === 0;
+  let saveError = false;
+
+  function uid(){ return Math.random().toString(36).slice(2,10); }
+
+  function dbUrl(){
+    return FIREBASE_DB_URL.replace(/\/$/,"") + "/" + DATA_PATH + ".json";
+  }
+
+  async function loadData(){
+    if(configError){ loaded = true; render(); return; }
+    try{
+      const res = await fetch(dbUrl());
+      if(res.ok){
+        const json = await res.json();
+        if(json) state = json;
+      }
+    }catch(e){
+      console.error("Load failed", e);
+    }
+    loaded = true;
+    render();
+  }
+
+  async function saveData(){
+    if(configError) return;
+    try{
+      const res = await fetch(dbUrl(), {
+        method: "PUT",
+        headers: {"Content-Type":"application/json"},
+        body: JSON.stringify(state)
+      });
+      if(!res.ok) throw new Error("HTTP " + res.status);
+      saveError = false;
+    }catch(e){
+      console.error("Save failed", e);
+      saveError = true;
+      alert("Could not save to the database — check your internet connection. (If this keeps happening, your Firebase database rules or URL may need checking.)");
+    }
+  }
+
+  function pointsFor(playerId, gw){
+    const p = state.players.find(x=>x.id===playerId);
+    if(!p) return 0;
+    const stat = (state.gameweeks[gw]||{})[playerId];
+    if(!stat) return 0;
+    let pts = Number(stat.rating)||0;
+    pts += (Number(stat.goals)||0) * 2;
+    pts += (Number(stat.assists)||0) * 1;
+    if(stat.cleanSheet && ["GK","DEF","MID"].includes(p.pos)) pts += 2;
+    return pts;
+  }
+
+  function managerTotalForGW(manager, gw){
+    return manager.squad.reduce((sum,pid)=>sum+pointsFor(pid,gw),0);
+  }
+
+  function managerGrandTotal(manager){
+    const gws = Object.keys(state.gameweeks);
+    return gws.reduce((sum,gw)=>sum+managerTotalForGW(manager,gw),0);
+  }
+
+  function allGWNumbers(){
+    const fromData = Object.keys(state.gameweeks).map(Number);
+    const max = fromData.length ? Math.max(...fromData) : 0;
+    const list = [];
+    for(let i=1;i<=Math.max(max,currentGW);i++) list.push(i);
+    return list;
+  }
+
+  function draftedPlayerIds(){
+    const set = new Set();
+    state.managers.forEach(m=>m.squad.forEach(pid=>set.add(pid)));
+    return set;
+  }
+
+  // ---------- Render ----------
+  function render(){
+    if(!loaded){
+      root.innerHTML = `<div class="loading">Loading league data…</div>`;
+      return;
+    }
+    if(configError){
+      root.innerHTML = `
+        <div class="wrap">
+          <div class="header"><h1>World Cup <span>Fantasy</span></h1></div>
+          <div class="panel">
+            <h2>One setup step left</h2>
+            <p style="line-height:1.6;">This app needs a free Firebase database to save everyone's picks and stats. Open this file's code, find the line near the top that says:</p>
+            <pre style="background:var(--turf-dark);padding:12px;border-radius:4px;overflow-x:auto;font-family:var(--font-mono);font-size:13px;">const FIREBASE_DB_URL = "PASTE_YOUR_FIREBASE_DATABASE_URL_HERE";</pre>
+            <p style="line-height:1.6;">...and replace the placeholder with your own Firebase Realtime Database URL, then re-upload/save the file. See the setup instructions provided alongside this file for step-by-step help.</p>
+          </div>
+        </div>`;
+      return;
+    }
+    root.innerHTML = `
+      <div class="wrap">
+        <div class="header">
+          <h1>World Cup <span>Fantasy</span></h1>
+          <div class="sub">Rating + Goals (2) + Assists (1) + Clean Sheet (2, GK/DEF/MID only)</div>
+        </div>
+        ${renderTicker()}
+        <div class="tabs">
+          ${tabBtn("squads","Squads & Draft")}
+          ${tabBtn("players","Player Pool")}
+          ${tabBtn("gameweek","Gameweek Stats")}
+          ${tabBtn("standings","Standings")}
+        </div>
+        <div class="panel">${renderPanel()}</div>
+      </div>
+    `;
+    attachHandlers();
+  }
+
+  function tabBtn(id,label){
+    return `<button class="tab-btn ${activeTab===id?'active':''}" data-tab="${id}">${label}</button>`;
+  }
+
+  function renderTicker(){
+    if(state.managers.length===0) return "";
+    const sorted = [...state.managers].sort((a,b)=>managerGrandTotal(b)-managerGrandTotal(a));
+    const items = sorted.map(m=>`<span class="ticker-item"><b>${escapeHtml(m.name)}</b> ${managerGrandTotal(m)} PTS</span>`).join("");
+    return `<div class="ticker"><div class="ticker-inner">${items}${items}</div></div>`;
+  }
+
+  function renderPanel(){
+    if(activeTab==="squads") return renderSquads();
+    if(activeTab==="players") return renderPlayers();
+    if(activeTab==="gameweek") return renderGameweek();
+    if(activeTab==="standings") return renderStandings();
+    return "";
+  }
+
+  function renderSquads(){
+    let html = `<h2>Squads & Draft</h2>
+      <div class="row">
+        <div class="field"><label>New manager name</label><input id="new-manager-name" placeholder="e.g. Mike's Misfits" /></div>
+        <button class="btn" id="add-manager-btn">Add Manager</button>
+      </div>`;
+
+    if(state.managers.length===0){
+      html += `<div class="empty">No managers yet. Add yourself and your friends above to start drafting.</div>`;
+      return html;
+    }
+
+    html += `<div class="manager-select-bar">`;
+    state.managers.forEach(m=>{
+      html += `<button class="manager-chip ${selectedManagerId===m.id?'active':''}" data-manager="${m.id}">${escapeHtml(m.name)} (${m.squad.length}/11)</button>`;
+    });
+    html += `</div>`;
+
+    const mgr = state.managers.find(m=>m.id===selectedManagerId) || state.managers[0];
+    if(!mgr){ html += `<div class="empty">Select a manager above.</div>`; return html; }
+    selectedManagerId = mgr.id;
+
+    const taken = draftedPlayerIds();
+    const available = state.players.filter(p=>!taken.has(p.id) || mgr.squad.includes(p.id));
+
+    html += `<h3>${escapeHtml(mgr.name)}'s Squad <span class="count-badge">${mgr.squad.length}/11 drafted</span>
+      <button class="btn danger" style="float:right;font-size:12px;padding:5px 10px;" data-remove-manager="${mgr.id}">Remove Manager</button></h3>`;
+
+    if(mgr.squad.length===0){
+      html += `<div class="empty">No players drafted yet.</div>`;
+    } else {
+      html += `<div class="squad-grid">`;
+      mgr.squad.forEach(pid=>{
+        const p = state.players.find(x=>x.id===pid);
+        if(!p) return;
+        html += `<div class="squad-card">
+          <button data-undraft="${p.id}" data-manager-for-undraft="${mgr.id}" title="Drop player">✕</button>
+          <span class="pos-tag pos-${p.pos}">${p.pos}</span>
+          <span class="name">${escapeHtml(p.name)}</span>
+          <span class="team">${escapeHtml(p.team)}</span>
+        </div>`;
+      });
+      html += `</div>`;
+    }
+
+    html += `<h3>Available Players</h3>`;
+    if(state.players.length===0){
+      html += `<div class="empty">No players in the pool yet — add some in the Player Pool tab first.</div>`;
+    } else if(mgr.squad.length>=11){
+      html += `<div class="note">Squad is full (11/11). Drop a player above to draft someone new.</div>`;
+    } else {
+      html += `<table><thead><tr><th>Player</th><th>Team</th><th>Pos</th><th></th></tr></thead><tbody>`;
+      available.filter(p=>!mgr.squad.includes(p.id)).forEach(p=>{
+        html += `<tr>
+          <td>${escapeHtml(p.name)}</td>
+          <td>${escapeHtml(p.team)}</td>
+          <td><span class="pos-tag pos-${p.pos}">${p.pos}</span></td>
+          <td><button class="btn secondary" style="padding:5px 12px;font-size:12px;" data-draft="${p.id}" data-manager-for-draft="${mgr.id}">Draft</button></td>
+        </tr>`;
+      });
+      html += `</tbody></table>`;
+    }
+    return html;
+  }
+
+  function renderPlayers(){
+    let html = `<h2>Player Pool</h2>
+      <div class="row">
+        <button class="btn secondary" id="preload-btn">⚽ Preload Starter Squads (16 nations)</button>
+      </div>
+      <div class="note">Loads a starter list of well-known players across 16 national teams as a quick base — correct names, add missing players, or remove anyone to match your group's actual rosters. Won't duplicate players you've already added.</div>
+      <div class="row" style="margin-top:16px;">
+        <div class="field"><label>Player name</label><input id="np-name" placeholder="e.g. Kylian Mbappé" /></div>
+        <div class="field"><label>Team / Country</label><input id="np-team" placeholder="e.g. France" /></div>
+        <div class="field" style="flex:0 0 110px;"><label>Position</label>
+          <select id="np-pos">
+            <option value="GK">GK</option>
+            <option value="DEF">DEF</option>
+            <option value="MID">MID</option>
+            <option value="FWD">FWD</option>
+          </select>
+        </div>
+        <button class="btn" id="add-player-btn">Add Player</button>
+      </div>
+      <div class="note">Add every player your group might draft. Once a player is drafted by a manager, they're locked to that squad — drop them from a squad in the Squads tab to free them up.</div>`;
+
+    if(state.players.length===0){
+      html += `<div class="empty">No players added yet.</div>`;
+      return html;
+    }
+
+    const taken = draftedPlayerIds();
+    html += `<table><thead><tr><th>Player</th><th>Team</th><th>Pos</th><th>Status</th><th></th></tr></thead><tbody>`;
+    state.players.slice().sort((a,b)=>a.name.localeCompare(b.name)).forEach(p=>{
+      const isTaken = taken.has(p.id);
+      html += `<tr>
+        <td>${escapeHtml(p.name)}</td>
+        <td>${escapeHtml(p.team)}</td>
+        <td><span class="pos-tag pos-${p.pos}">${p.pos}</span></td>
+        <td>${isTaken ? '<span style="color:var(--crowd);font-family:var(--font-mono);font-size:12px;">DRAFTED</span>' : '<span style="color:var(--amber);font-family:var(--font-mono);font-size:12px;">FREE AGENT</span>'}</td>
+        <td><button class="btn danger" style="padding:5px 10px;font-size:12px;" data-delete-player="${p.id}" ${isTaken ? 'disabled title="Drop from squad first"' : ''}>Delete</button></td>
+      </tr>`;
+    });
+    html += `</tbody></table>`;
+    return html;
+  }
+
+  function renderGameweek(){
+    const gws = allGWNumbers();
+    let html = `<h2>Gameweek Stats</h2>
+      <div class="row gw-select">
+        <div class="field" style="flex:0 0 160px;"><label>Gameweek</label>
+          <select id="gw-picker">
+            ${gws.map(g=>`<option value="${g}" ${g===currentGW?'selected':''}>Gameweek ${g}</option>`).join("")}
+          </select>
+        </div>
+        <button class="btn secondary" id="add-gw-btn">+ New Gameweek</button>
+      </div>`;
+
+    const drafted = state.players.filter(p=>draftedPlayerIds().has(p.id));
+    if(drafted.length===0){
+      html += `<div class="empty">No drafted players yet. Draft squads first, then enter their match stats here each gameweek.</div>`;
+      return html;
+    }
+
+    html += `<table><thead><tr>
+      <th>Player</th><th>Pos</th><th>Rating</th><th>Goals</th><th>Assists</th><th>Clean Sheet</th><th>Points</th>
+    </tr></thead><tbody>`;
+
+    drafted.slice().sort((a,b)=>a.name.localeCompare(b.name)).forEach(p=>{
+      const stat = (state.gameweeks[currentGW]||{})[p.id] || {rating:"",goals:0,assists:0,cleanSheet:false};
+      const csApplies = ["GK","DEF","MID"].includes(p.pos);
+      html += `<tr>
+        <td>${escapeHtml(p.name)}<div class="standings-sub">${escapeHtml(p.team)}</div></td>
+        <td><span class="pos-tag pos-${p.pos}">${p.pos}</span></td>
+        <td><input type="number" step="0.1" min="0" max="10" style="width:64px;" data-stat="rating" data-player="${p.id}" value="${stat.rating}" placeholder="0.0"></td>
+        <td><input type="number" min="0" style="width:54px;" data-stat="goals" data-player="${p.id}" value="${stat.goals||0}"></td>
+        <td><input type="number" min="0" style="width:54px;" data-stat="assists" data-player="${p.id}" value="${stat.assists||0}"></td>
+        <td>${csApplies ? `<input type="checkbox" data-stat="cleanSheet" data-player="${p.id}" ${stat.cleanSheet?'checked':''}>` : '<span style="color:var(--crowd);">—</span>'}</td>
+        <td style="font-family:var(--font-mono);color:var(--amber);">${pointsFor(p.id,currentGW).toFixed(1)}</td>
+      </tr>`;
+    });
+    html += `</tbody></table>
+      <div class="note">Stats save automatically as you type. Points update live using rating + goals×2 + assists×1 + clean sheet×2 (GK/DEF/MID only).</div>`;
+    return html;
+  }
+
+  function renderStandings(){
+    if(state.managers.length===0) return `<h2>Standings</h2><div class="empty">Add managers and draft squads to see standings.</div>`;
+    const gws = allGWNumbers();
+    let html = `<h2>Standings</h2>`;
+    const sorted = [...state.managers].sort((a,b)=>managerGrandTotal(b)-managerGrandTotal(a));
+    sorted.forEach((m,i)=>{
+      html += `<div class="standings-row">
+        <div class="rank ${i===0?'r1':''}">${i+1}</div>
+        <div>
+          <div class="standings-name">${escapeHtml(m.name)}</div>
+          <div class="standings-sub">${m.squad.length} players drafted</div>
+        </div>
+        <div class="standings-pts">${managerGrandTotal(m).toFixed(1)}</div>
+      </div>`;
+    });
+
+    if(gws.length>0){
+      html += `<h3>By Gameweek</h3><table><thead><tr><th>Manager</th>${gws.map(g=>`<th>GW${g}</th>`).join("")}<th>Total</th></tr></thead><tbody>`;
+      sorted.forEach(m=>{
+        html += `<tr><td>${escapeHtml(m.name)}</td>`;
+        gws.forEach(g=>{ html += `<td style="font-family:var(--font-mono);">${managerTotalForGW(m,g).toFixed(1)}</td>`; });
+        html += `<td style="font-family:var(--font-mono);color:var(--amber);">${managerGrandTotal(m).toFixed(1)}</td></tr>`;
+      });
+      html += `</tbody></table>`;
+    }
+    return html;
+  }
+
+  function escapeHtml(str){
+    return String(str).replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+  }
+
+  // ---------- Event handling ----------
+  function attachHandlers(){
+    root.querySelectorAll("[data-tab]").forEach(btn=>{
+      btn.onclick = ()=>{ activeTab = btn.dataset.tab; render(); };
+    });
+
+    const addManagerBtn = root.querySelector("#add-manager-btn");
+    if(addManagerBtn) addManagerBtn.onclick = async ()=>{
+      const input = root.querySelector("#new-manager-name");
+      const name = input.value.trim();
+      if(!name) return;
+      const m = {id:uid(), name, squad:[]};
+      state.managers.push(m);
+      selectedManagerId = m.id;
+      render();
+      await saveData();
+    };
+
+    root.querySelectorAll("[data-manager]").forEach(btn=>{
+      btn.onclick = ()=>{ selectedManagerId = btn.dataset.manager; render(); };
+    });
+
+    root.querySelectorAll("[data-remove-manager]").forEach(btn=>{
+      btn.onclick = async ()=>{
+        if(!confirm("Remove this manager and free up their drafted players?")) return;
+        state.managers = state.managers.filter(m=>m.id!==btn.dataset.removeManager);
+        selectedManagerId = state.managers[0] ? state.managers[0].id : null;
+        render();
+        await saveData();
+      };
+    });
+
+    root.querySelectorAll("[data-draft]").forEach(btn=>{
+      btn.onclick = async ()=>{
+        const mgr = state.managers.find(m=>m.id===btn.dataset.managerForDraft);
+        if(!mgr || mgr.squad.length>=11) return;
+        mgr.squad.push(btn.dataset.draft);
+        render();
+        await saveData();
+      };
+    });
+
+    root.querySelectorAll("[data-undraft]").forEach(btn=>{
+      btn.onclick = async ()=>{
+        const mgr = state.managers.find(m=>m.id===btn.dataset.managerForUndraft);
+        if(!mgr) return;
+        mgr.squad = mgr.squad.filter(pid=>pid!==btn.dataset.undraft);
+        render();
+        await saveData();
+      };
+    });
+
+    const preloadBtn = root.querySelector("#preload-btn");
+    if(preloadBtn) preloadBtn.onclick = async ()=>{
+      const existingNames = new Set(state.players.map(p=>p.name.toLowerCase()+"|"+p.team.toLowerCase()));
+      let added = 0;
+      SEED_PLAYERS.forEach(([name,team,pos])=>{
+        const key = name.toLowerCase()+"|"+team.toLowerCase();
+        if(!existingNames.has(key)){
+          state.players.push({id:uid(), name, team, pos});
+          existingNames.add(key);
+          added++;
+        }
+      });
+      render();
+      await saveData();
+      alert(added+" players added to the pool. Edit or remove any in the table below.");
+    };
+
+    const addPlayerBtn = root.querySelector("#add-player-btn");
+    if(addPlayerBtn) addPlayerBtn.onclick = async ()=>{
+      const name = root.querySelector("#np-name").value.trim();
+      const team = root.querySelector("#np-team").value.trim();
+      const pos = root.querySelector("#np-pos").value;
+      if(!name || !team) return;
+      state.players.push({id:uid(), name, team, pos});
+      root.querySelector("#np-name").value="";
+      root.querySelector("#np-team").value="";
+      render();
+      await saveData();
+    };
+
+    root.querySelectorAll("[data-delete-player]").forEach(btn=>{
+      btn.onclick = async ()=>{
+        if(btn.disabled) return;
+        if(!confirm("Delete this player from the pool?")) return;
+        state.players = state.players.filter(p=>p.id!==btn.dataset.deletePlayer);
+        render();
+        await saveData();
+      };
+    });
+
+    const gwPicker = root.querySelector("#gw-picker");
+    if(gwPicker) gwPicker.onchange = ()=>{ currentGW = Number(gwPicker.value); render(); };
+
+    const addGwBtn = root.querySelector("#add-gw-btn");
+    if(addGwBtn) addGwBtn.onclick = ()=>{
+      const gws = allGWNumbers();
+      currentGW = Math.max(...gws) + 1;
+      render();
+    };
+
+    root.querySelectorAll("[data-stat]").forEach(inputEl=>{
+      const handler = async ()=>{
+        const pid = inputEl.dataset.player;
+        const statName = inputEl.dataset.stat;
+        if(!state.gameweeks[currentGW]) state.gameweeks[currentGW] = {};
+        if(!state.gameweeks[currentGW][pid]) state.gameweeks[currentGW][pid] = {rating:0,goals:0,assists:0,cleanSheet:false};
+        const stat = state.gameweeks[currentGW][pid];
+        if(statName==="cleanSheet"){
+          stat.cleanSheet = inputEl.checked;
+        } else if(statName==="rating"){
+          stat.rating = inputEl.value===""? "" : Number(inputEl.value);
+        } else {
+          stat[statName] = Number(inputEl.value)||0;
+        }
+        // live update points cell without full re-render to keep input focus
+        const row = inputEl.closest("tr");
+        const ptsCell = row.querySelector("td:last-child");
+        if(ptsCell) ptsCell.textContent = pointsFor(pid,currentGW).toFixed(1);
+        await saveData();
+      };
+      inputEl.oninput = handler;
+      inputEl.onchange = handler;
+    });
+  }
+
+  loadData();
+})();
+</script>
