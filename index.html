@@ -157,7 +157,7 @@ tr:hover td{background:rgba(255,255,255,0.02);}
 <script>
 (function(){
   // ====== FIREBASE SETUP — paste your Realtime Database URL here ======
-  // Example: "https://your-project-id-default-rtdb.firebaseio.com"
+  // Example: "https://wc-fantasy-65f06-default-rtdb.firebaseio.com/"
   const FIREBASE_DB_URL = "https://wc-fantasy-65f06-default-rtdb.firebaseio.com/";
   const DATA_PATH = "wc_fantasy_league_v1";
   // ======================================================================
@@ -289,17 +289,19 @@ tr:hover td{background:rgba(255,255,255,0.02);}
   }
 
   function managerGrandTotal(manager){
-    const gws = Object.keys(state.gameweeks);
-    return gws.reduce((sum,gw)=>sum+managerTotalForGW(manager,gw),0);
-  }
+  // Add || {} to fallback safely if gameweeks is null/undefined
+  const gws = Object.keys(state.gameweeks || {}); 
+  return gws.reduce((sum,gw)=>sum+managerTotalForGW(manager,gw),0);
+}
 
   function allGWNumbers(){
-    const fromData = Object.keys(state.gameweeks).map(Number);
-    const max = fromData.length ? Math.max(...fromData) : 0;
-    const list = [];
-    for(let i=1;i<=Math.max(max,currentGW);i++) list.push(i);
-    return list;
-  }
+  // Add || {} here as well to protect the Object.keys call
+  const fromData = Object.keys(state.gameweeks || {}).map(Number);
+  const max = fromData.length ? Math.max(...fromData) : 0;
+  const list = [];
+  for(let i=1;i<=Math.max(max,currentGW);i++) list.push(i);
+  return list;
+}
 
   function draftedPlayerIds(){
     const set = new Set();
