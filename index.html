@@ -105,7 +105,7 @@ th{
 td{
   padding:9px 8px;
   border-bottom:1px solid rgba(255,255,255,0.06);
-  color: #ffffff; /* 👈 This forces the text to be pure white */
+  color: #ffffff; /* 🌟 FIX: Forces table names/teams to render in white */
 }
 tr:hover td{background:rgba(255,255,255,0.02);}
 .pos-tag{
@@ -161,7 +161,6 @@ tr:hover td{background:rgba(255,255,255,0.02);}
 <script>
 (function(){
   // ====== FIREBASE SETUP — paste your Realtime Database URL here ======
-  // Example: "https://wc-fantasy-65f06-default-rtdb.firebaseio.com/"
   const FIREBASE_DB_URL = "https://wc-fantasy-65f06-default-rtdb.firebaseio.com/";
   const DATA_PATH = "wc_fantasy_league_v1";
   // ======================================================================
@@ -250,7 +249,13 @@ tr:hover td{background:rgba(255,255,255,0.02);}
       const res = await fetch(dbUrl());
       if(res.ok){
         const json = await res.json();
-        if(json) state = json;
+        if(json) {
+          state = json;
+          // Ensure base states always exist natively inside state variable
+          if(!state.players) state.players = [];
+          if(!state.managers) state.managers = [];
+          if(!state.gameweeks) state.gameweeks = {};
+        }
       }
     }catch(e){
       console.error("Load failed", e);
@@ -272,14 +277,14 @@ tr:hover td{background:rgba(255,255,255,0.02);}
     }catch(e){
       console.error("Save failed", e);
       saveError = true;
-      alert("Could not save to the database — check your internet connection. (If this keeps happening, your Firebase database rules or URL may need checking.)");
+      alert("Could not save to the database — check your internet connection.");
     }
   }
 
   function pointsFor(playerId, gw){
-    const p = state.players.find(x=>x.id===playerId);
+    const p = (state.players || []).find(x=>x.id===playerId);
     if(!p) return 0;
-    const stat = (state.gameweeks[gw]||{})[playerId];
+    const stat = ((state.gameweeks || {})[gw]||{})[playerId];
     if(!stat) return 0;
     let pts = Number(stat.rating)||0;
     pts += (Number(stat.goals)||0) * 2;
@@ -289,27 +294,25 @@ tr:hover td{background:rgba(255,255,255,0.02);}
   }
 
   function managerTotalForGW(manager, gw){
-    return manager.squad.reduce((sum,pid)=>sum+pointsFor(pid,gw),0);
+    return (manager.squad || []).reduce((sum,pid)=>sum+pointsFor(pid,gw),0);
   }
 
   function managerGrandTotal(manager){
-  // Add || {} to fallback safely if gameweeks is null/undefined
-  const gws = Object.keys(state.gameweeks || {}); 
-  return gws.reduce((sum,gw)=>sum+managerTotalForGW(manager,gw),0);
-}
+    const gws = Object.keys(state.gameweeks || {});
+    return gws.reduce((sum,gw)=>sum+managerTotalForGW(manager,gw),0);
+  }
 
   function allGWNumbers(){
-  // Add || {} here as well to protect the Object.keys call
-  const fromData = Object.keys(state.gameweeks || {}).map(Number);
-  const max = fromData.length ? Math.max(...fromData) : 0;
-  const list = [];
-  for(let i=1;i<=Math.max(max,currentGW);i++) list.push(i);
-  return list;
-}
+    const fromData = Object.keys(state.gameweeks || {}).map(Number);
+    const max = fromData.length ? Math.max(...fromData) : 0;
+    const list = [];
+    for(let i=1;i<=Math.max(max,currentGW);i++) list.push(i);
+    return list;
+  }
 
   function draftedPlayerIds(){
     const set = new Set();
-    state.managers.forEach(m=>m.squad.forEach(pid=>set.add(pid)));
+    (state.managers || []).forEach(m=>(m.squad || []).forEach(pid=>set.add(pid)));
     return set;
   }
 
@@ -325,9 +328,7 @@ tr:hover td{background:rgba(255,255,255,0.02);}
           <div class="header"><h1>World Cup <span>Fantasy</span></h1></div>
           <div class="panel">
             <h2>One setup step left</h2>
-            <p style="line-height:1.6;">This app needs a free Firebase database to save everyone's picks and stats. Open this file's code, find the line near the top that says:</p>
-            <pre style="background:var(--turf-dark);padding:12px;border-radius:4px;overflow-x:auto;font-family:var(--font-mono);font-size:13px;">const FIREBASE_DB_URL = "PASTE_YOUR_FIREBASE_DATABASE_URL_HERE";</pre>
-            <p style="line-height:1.6;">...and replace the placeholder with your own Firebase Realtime Database URL, then re-upload/save the file. See the setup instructions provided alongside this file for step-by-step help.</p>
+            <p style="line-height:1.6;">Replace the placeholder with your own Firebase Realtime Database URL.</p>
           </div>
         </div>`;
       return;
@@ -356,9 +357,9 @@ tr:hover td{background:rgba(255,255,255,0.02);}
   }
 
   function renderTicker(){
-    if(state.managers.length===0) return "";
+    if(!state.managers || state.managers.length===0) return "";
     const sorted = [...state.managers].sort((a,b)=>managerGrandTotal(b)-managerGrandTotal(a));
-    const items = sorted.map(m=>`<span class="ticker-item"><b>${escapeHtml(m.name)}</b> ${managerGrandTotal(m)} PTS</span>`).join("");
+    const items = sorted.map(m=>`<span class="ticker-item"><b>${escapeHtml(m.name)}</b> ${managerGrandTotal(m).toFixed(1)} PTS</span>`).join("");
     return `<div class="ticker"><div class="ticker-inner">${items}${items}</div></div>`;
   }
 
@@ -377,14 +378,15 @@ tr:hover td{background:rgba(255,255,255,0.02);}
         <button class="btn" id="add-manager-btn">Add Manager</button>
       </div>`;
 
-    if(state.managers.length===0){
+    if(!state.managers || state.managers.length===0){
       html += `<div class="empty">No managers yet. Add yourself and your friends above to start drafting.</div>`;
       return html;
     }
 
     html += `<div class="manager-select-bar">`;
     state.managers.forEach(m=>{
-      html += `<button class="manager-chip ${selectedManagerId===m.id?'active':''}" data-manager="${m.id}">${escapeHtml(m.name)} (${m.squad.length}/11)</button>`;
+      const squadLen = (m.squad || []).length;
+      html += `<button class="manager-chip ${selectedManagerId===m.id?'active':''}" data-manager="${m.id}">${escapeHtml(m.name)} (${squadLen}/11)</button>`;
     });
     html += `</div>`;
 
@@ -393,16 +395,17 @@ tr:hover td{background:rgba(255,255,255,0.02);}
     selectedManagerId = mgr.id;
 
     const taken = draftedPlayerIds();
-    const available = state.players.filter(p=>!taken.has(p.id) || mgr.squad.includes(p.id));
+    const available = (state.players || []).filter(p=>!taken.has(p.id) || (mgr.squad || []).includes(p.id));
+    const currentSquad = mgr.squad || [];
 
-    html += `<h3>${escapeHtml(mgr.name)}'s Squad <span class="count-badge">${mgr.squad.length}/11 drafted</span>
+    html += `<h3>${escapeHtml(mgr.name)}'s Squad <span class="count-badge">${currentSquad.length}/11 drafted</span>
       <button class="btn danger" style="float:right;font-size:12px;padding:5px 10px;" data-remove-manager="${mgr.id}">Remove Manager</button></h3>`;
 
-    if(mgr.squad.length===0){
+    if(currentSquad.length===0){
       html += `<div class="empty">No players drafted yet.</div>`;
     } else {
       html += `<div class="squad-grid">`;
-      mgr.squad.forEach(pid=>{
+      currentSquad.forEach(pid=>{
         const p = state.players.find(x=>x.id===pid);
         if(!p) return;
         html += `<div class="squad-card">
@@ -416,13 +419,13 @@ tr:hover td{background:rgba(255,255,255,0.02);}
     }
 
     html += `<h3>Available Players</h3>`;
-    if(state.players.length===0){
+    if(!state.players || state.players.length===0){
       html += `<div class="empty">No players in the pool yet — add some in the Player Pool tab first.</div>`;
-    } else if(mgr.squad.length>=11){
+    } else if(currentSquad.length>=11){
       html += `<div class="note">Squad is full (11/11). Drop a player above to draft someone new.</div>`;
     } else {
       html += `<table><thead><tr><th>Player</th><th>Team</th><th>Pos</th><th></th></tr></thead><tbody>`;
-      available.filter(p=>!mgr.squad.includes(p.id)).forEach(p=>{
+      available.filter(p=>!currentSquad.includes(p.id)).forEach(p=>{
         html += `<tr>
           <td>${escapeHtml(p.name)}</td>
           <td>${escapeHtml(p.team)}</td>
@@ -440,7 +443,6 @@ tr:hover td{background:rgba(255,255,255,0.02);}
       <div class="row">
         <button class="btn secondary" id="preload-btn">⚽ Preload Starter Squads (16 nations)</button>
       </div>
-      <div class="note">Loads a starter list of well-known players across 16 national teams as a quick base — correct names, add missing players, or remove anyone to match your group's actual rosters. Won't duplicate players you've already added.</div>
       <div class="row" style="margin-top:16px;">
         <div class="field"><label>Player name</label><input id="np-name" placeholder="e.g. Kylian Mbappé" /></div>
         <div class="field"><label>Team / Country</label><input id="np-team" placeholder="e.g. France" /></div>
@@ -453,10 +455,9 @@ tr:hover td{background:rgba(255,255,255,0.02);}
           </select>
         </div>
         <button class="btn" id="add-player-btn">Add Player</button>
-      </div>
-      <div class="note">Add every player your group might draft. Once a player is drafted by a manager, they're locked to that squad — drop them from a squad in the Squads tab to free them up.</div>`;
+      </div>`;
 
-    if(state.players.length===0){
+    if(!state.players || state.players.length===0){
       html += `<div class="empty">No players added yet.</div>`;
       return html;
     }
@@ -489,7 +490,7 @@ tr:hover td{background:rgba(255,255,255,0.02);}
         <button class="btn secondary" id="add-gw-btn">+ New Gameweek</button>
       </div>`;
 
-    const drafted = state.players.filter(p=>draftedPlayerIds().has(p.id));
+    const drafted = (state.players || []).filter(p=>draftedPlayerIds().has(p.id));
     if(drafted.length===0){
       html += `<div class="empty">No drafted players yet. Draft squads first, then enter their match stats here each gameweek.</div>`;
       return html;
@@ -500,7 +501,7 @@ tr:hover td{background:rgba(255,255,255,0.02);}
     </tr></thead><tbody>`;
 
     drafted.slice().sort((a,b)=>a.name.localeCompare(b.name)).forEach(p=>{
-      const stat = (state.gameweeks[currentGW]||{})[p.id] || {rating:"",goals:0,assists:0,cleanSheet:false};
+      const stat = ((state.gameweeks || {})[currentGW]||{})[p.id] || {rating:"",goals:0,assists:0,cleanSheet:false};
       const csApplies = ["GK","DEF","MID"].includes(p.pos);
       html += `<tr>
         <td>${escapeHtml(p.name)}<div class="standings-sub">${escapeHtml(p.team)}</div></td>
@@ -512,22 +513,22 @@ tr:hover td{background:rgba(255,255,255,0.02);}
         <td style="font-family:var(--font-mono);color:var(--amber);">${pointsFor(p.id,currentGW).toFixed(1)}</td>
       </tr>`;
     });
-    html += `</tbody></table>
-      <div class="note">Stats save automatically as you type. Points update live using rating + goals×2 + assists×1 + clean sheet×2 (GK/DEF/MID only).</div>`;
+    html += `</tbody></table>`;
     return html;
   }
 
   function renderStandings(){
-    if(state.managers.length===0) return `<h2>Standings</h2><div class="empty">Add managers and draft squads to see standings.</div>`;
+    if(!state.managers || state.managers.length===0) return `<h2>Standings</h2><div class="empty">Add managers and draft squads to see standings.</div>`;
     const gws = allGWNumbers();
     let html = `<h2>Standings</h2>`;
     const sorted = [...state.managers].sort((a,b)=>managerGrandTotal(b)-managerGrandTotal(a));
     sorted.forEach((m,i)=>{
+      const squadLen = (m.squad || []).length;
       html += `<div class="standings-row">
         <div class="rank ${i===0?'r1':''}">${i+1}</div>
         <div>
           <div class="standings-name">${escapeHtml(m.name)}</div>
-          <div class="standings-sub">${m.squad.length} players drafted</div>
+          <div class="standings-sub">${squadLen} players drafted</div>
         </div>
         <div class="standings-pts">${managerGrandTotal(m).toFixed(1)}</div>
       </div>`;
@@ -560,6 +561,7 @@ tr:hover td{background:rgba(255,255,255,0.02);}
       const input = root.querySelector("#new-manager-name");
       const name = input.value.trim();
       if(!name) return;
+      if(!state.managers) state.managers = [];
       const m = {id:uid(), name, squad:[]};
       state.managers.push(m);
       selectedManagerId = m.id;
@@ -574,7 +576,7 @@ tr:hover td{background:rgba(255,255,255,0.02);}
     root.querySelectorAll("[data-remove-manager]").forEach(btn=>{
       btn.onclick = async ()=>{
         if(!confirm("Remove this manager and free up their drafted players?")) return;
-        state.managers = state.managers.filter(m=>m.id!==btn.dataset.removeManager);
+        state.managers = (state.managers || []).filter(m=>m.id!==btn.dataset.removeManager);
         selectedManagerId = state.managers[0] ? state.managers[0].id : null;
         render();
         await saveData();
@@ -584,7 +586,9 @@ tr:hover td{background:rgba(255,255,255,0.02);}
     root.querySelectorAll("[data-draft]").forEach(btn=>{
       btn.onclick = async ()=>{
         const mgr = state.managers.find(m=>m.id===btn.dataset.managerForDraft);
-        if(!mgr || mgr.squad.length>=11) return;
+        if(!mgr) return;
+        if(!mgr.squad) mgr.squad = [];
+        if(mgr.squad.length >= 11) return;
         mgr.squad.push(btn.dataset.draft);
         render();
         await saveData();
@@ -595,7 +599,7 @@ tr:hover td{background:rgba(255,255,255,0.02);}
       btn.onclick = async ()=>{
         const mgr = state.managers.find(m=>m.id===btn.dataset.managerForUndraft);
         if(!mgr) return;
-        mgr.squad = mgr.squad.filter(pid=>pid!==btn.dataset.undraft);
+        mgr.squad = (mgr.squad || []).filter(pid=>pid!==btn.dataset.undraft);
         render();
         await saveData();
       };
@@ -603,6 +607,7 @@ tr:hover td{background:rgba(255,255,255,0.02);}
 
     const preloadBtn = root.querySelector("#preload-btn");
     if(preloadBtn) preloadBtn.onclick = async ()=>{
+      if(!state.players) state.players = [];
       const existingNames = new Set(state.players.map(p=>p.name.toLowerCase()+"|"+p.team.toLowerCase()));
       let added = 0;
       SEED_PLAYERS.forEach(([name,team,pos])=>{
@@ -615,7 +620,7 @@ tr:hover td{background:rgba(255,255,255,0.02);}
       });
       render();
       await saveData();
-      alert(added+" players added to the pool. Edit or remove any in the table below.");
+      alert(added+" players added to the pool.");
     };
 
     const addPlayerBtn = root.querySelector("#add-player-btn");
@@ -624,6 +629,7 @@ tr:hover td{background:rgba(255,255,255,0.02);}
       const team = root.querySelector("#np-team").value.trim();
       const pos = root.querySelector("#np-pos").value;
       if(!name || !team) return;
+      if(!state.players) state.players = [];
       state.players.push({id:uid(), name, team, pos});
       root.querySelector("#np-name").value="";
       root.querySelector("#np-team").value="";
@@ -635,7 +641,7 @@ tr:hover td{background:rgba(255,255,255,0.02);}
       btn.onclick = async ()=>{
         if(btn.disabled) return;
         if(!confirm("Delete this player from the pool?")) return;
-        state.players = state.players.filter(p=>p.id!==btn.dataset.deletePlayer);
+        state.players = (state.players || []).filter(p=>p.id!==btn.dataset.deletePlayer);
         render();
         await saveData();
       };
@@ -652,11 +658,13 @@ tr:hover td{background:rgba(255,255,255,0.02);}
     };
 
     root.querySelectorAll("[data-stat]").forEach(inputEl=>{
-      const handler = async ()=>{
+      const handler = async () => {
         const pid = inputEl.dataset.player;
         const statName = inputEl.dataset.stat;
+        if(!state.gameweeks) state.gameweeks = {};
         if(!state.gameweeks[currentGW]) state.gameweeks[currentGW] = {};
         if(!state.gameweeks[currentGW][pid]) state.gameweeks[currentGW][pid] = {rating:0,goals:0,assists:0,cleanSheet:false};
+        
         const stat = state.gameweeks[currentGW][pid];
         if(statName==="cleanSheet"){
           stat.cleanSheet = inputEl.checked;
@@ -665,7 +673,7 @@ tr:hover td{background:rgba(255,255,255,0.02);}
         } else {
           stat[statName] = Number(inputEl.value)||0;
         }
-        // live update points cell without full re-render to keep input focus
+        
         const row = inputEl.closest("tr");
         const ptsCell = row.querySelector("td:last-child");
         if(ptsCell) ptsCell.textContent = pointsFor(pid,currentGW).toFixed(1);
