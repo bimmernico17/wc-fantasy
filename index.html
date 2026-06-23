@@ -188,25 +188,25 @@ tr:hover td{background:rgba(255,255,255,0.02);}
     ["Rodrigo De Paul","Argentina","MID"],["Enzo Fernandez","Argentina","MID"],["Alexis Mac Allister","Argentina","MID"],
     ["Cristian Romero","Argentina","DEF"],["Nicolas Otamendi","Argentina","DEF"],["Emiliano Martinez","Argentina","GK"],
     // France
-    ["Kylian Mbappe","France","FWD"],["Ousmane Dembele","France","FWD"],["Marcus Thuram","France","FWD"],
+    ["Kylian Mbappe","France","FWD"],["Ousmane Dembele","France","FWD"],["Marcus Thuram","France","FWD"],["Désiré Doué","France","FWD"],
     ["Antoine Griezmann","France","MID"],["Aurelien Tchouameni","France","MID"],["Eduardo Camavinga","France","MID"],
-    ["William Saliba","France","DEF"],["Dayot Upamecano","France","DEF"],["Mike Maignan","France","GK"],
+    ["William Saliba","France","DEF"],["Jules Kounde","France","DEF"],["Dayot Upamecano","France","DEF"],["Mike Maignan","France","GK"],
     // Brazil
-    ["Vinicius Junior","Brazil","FWD"],["Rodrygo","Brazil","FWD"],["Endrick","Brazil","FWD"],
+    ["Vinicius Junior","Brazil","FWD"],["Rodrygo","Brazil","FWD"],["Endrick","Brazil","FWD"],["Raphina","Brazil","FWD"],
     ["Bruno Guimaraes","Brazil","MID"],["Lucas Paqueta","Brazil","MID"],["Casemiro","Brazil","MID"],
     ["Marquinhos","Brazil","DEF"],["Eder Militao","Brazil","DEF"],["Alisson","Brazil","GK"],
     // England
     ["Harry Kane","England","FWD"],["Phil Foden","England","MID"],["Bukayo Saka","England","FWD"],
     ["Jude Bellingham","England","MID"],["Declan Rice","England","MID"],["Cole Palmer","England","MID"],
-    ["John Stones","England","DEF"],["Kyle Walker","England","DEF"],["Jordan Pickford","England","GK"],
+    ["John Stones","England","DEF"],["Trent Alexander Arnold","England","DEF"],["Kyle Walker","England","DEF"],["Jordan Pickford","England","GK"],
     // Spain
     ["Lamine Yamal","Spain","FWD"],["Nico Williams","Spain","FWD"],["Alvaro Morata","Spain","FWD"],
-    ["Pedri","Spain","MID"],["Rodri","Spain","MID"],["Fabian Ruiz","Spain","MID"],
-    ["Robin Le Normand","Spain","DEF"],["Dani Carvajal","Spain","DEF"],["Unai Simon","Spain","GK"],
+    ["Pedri","Spain","MID"],["Rodri","Spain","MID"],["Fabian Ruiz","Spain","MID"],["Gavi","Spain","MID"],
+    ["Robin Le Normand","Spain","DEF"],["Dani Carvajal","Spain","DEF"],["Marc Cucurella","Spain","DEF"],["Unai Simon","Spain","GK"],
     // Portugal
     ["Cristiano Ronaldo","Portugal","FWD"],["Joao Felix","Portugal","FWD"],["Goncalo Ramos","Portugal","FWD"],
     ["Bruno Fernandes","Portugal","MID"],["Bernardo Silva","Portugal","MID"],["Vitinha","Portugal","MID"],
-    ["Ruben Dias","Portugal","DEF"],["Joao Cancelo","Portugal","DEF"],["Diogo Costa","Portugal","GK"],
+    ["Ruben Dias","Portugal","DEF"],["Joao Cancelo","Portugal","DEF"],["Nuno Mendes","Portugal","DEF"],["Diogo Costa","Portugal","GK"],
     // Germany
     ["Jamal Musiala","Germany","MID"],["Florian Wirtz","Germany","MID"],["Kai Havertz","Germany","FWD"],
     ["Joshua Kimmich","Germany","MID"],["Leroy Sane","Germany","FWD"],["Niclas Fullkrug","Germany","FWD"],
@@ -214,11 +214,11 @@ tr:hover td{background:rgba(255,255,255,0.02);}
     // Netherlands
     ["Cody Gakpo","Netherlands","FWD"],["Memphis Depay","Netherlands","FWD"],["Xavi Simons","Netherlands","MID"],
     ["Frenkie de Jong","Netherlands","MID"],["Tijjani Reijnders","Netherlands","MID"],
-    ["Virgil van Dijk","Netherlands","DEF"],["Nathan Ake","Netherlands","DEF"],["Bart Verbruggen","Netherlands","GK"],
+    ["Virgil van Dijk","Netherlands","DEF"],["Denzel Dumfries","Netherlands","DEF"],["Nathan Ake","Netherlands","DEF"],["Bart Verbruggen","Netherlands","GK"],
     // Belgium
     ["Kevin De Bruyne","Belgium","MID"],["Romelu Lukaku","Belgium","FWD"],["Jeremy Doku","Belgium","FWD"],
     ["Youri Tielemans","Belgium","MID"],["Amadou Onana","Belgium","MID"],
-    ["Wout Faes","Belgium","DEF"],["Thomas Meunier","Belgium","DEF"],["Koen Casteels","Belgium","GK"],
+    ["Wout Faes","Belgium","DEF"],["Thomas Meunier","Belgium","DEF"],["Koen Casteels","Belgium","GK"],["Thibaut Courtois","Belgium","GK"],
     // Italy
     ["Federico Chiesa","Italy","FWD"],["Moise Kean","Italy","FWD"],["Nicolo Barella","Italy","MID"],
     ["Sandro Tonali","Italy","MID"],["Davide Frattesi","Italy","MID"],
@@ -242,9 +242,14 @@ tr:hover td{background:rgba(255,255,255,0.02);}
     ["Hidemasa Morita","Japan","MID"],["Zion Suzuki","Japan","GK"],
     // Senegal
     ["Sadio Mane","Senegal","FWD"],["Nicolas Jackson","Senegal","FWD"],["Idrissa Gueye","Senegal","MID"],
-    ["Kalidou Koulibaly","Senegal","DEF"],["Edouard Mendy","Senegal","GK"]
+    ["Kalidou Koulibaly","Senegal","DEF"],["Edouard Mendy","Senegal","GK"],
+    // Colombia
+    ["Luis Diaz","Colombia","FWD"],
+    // Ecuador
+    ["Willian Pancho","Ecuador","DEF"],
+    // Uruguay 
+    ["Federico Valverde","Uruguay","MID"]
   ];
-
   const root = document.getElementById("app-root");
   let configError = !FIREBASE_DB_URL || FIREBASE_DB_URL.indexOf("PASTE_YOUR") === 0;
   let saveError = false;
