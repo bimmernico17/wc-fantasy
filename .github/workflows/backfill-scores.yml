@@ -1,0 +1,38 @@
+name: Backfill Past Gameweek Scores
+
+on:
+  workflow_dispatch:
+    inputs:
+      gw:
+        description: "Gameweek number to backfill (e.g. 1)"
+        required: true
+        default: "1"
+      from_date:
+        description: "Start date (YYYY-MM-DD)"
+        required: true
+        default: "2026-06-11"
+      to_date:
+        description: "End date (YYYY-MM-DD)"
+        required: true
+        default: "2026-06-17"
+
+jobs:
+  backfill-scores:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Run backfill script
+        env:
+          API_FOOTBALL_KEY: ${{ secrets.API_FOOTBALL_KEY }}
+          FIREBASE_DB_URL: ${{ secrets.FIREBASE_DB_URL }}
+          GW: ${{ inputs.gw }}
+          FROM_DATE: ${{ inputs.from_date }}
+          TO_DATE: ${{ inputs.to_date }}
+        run: node backfill-scores.js
